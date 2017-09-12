@@ -22,18 +22,20 @@ pys=["a","ai","an","ang","ao","ba","bai","ban","bang","bao","bei","ben","beng","
 #give py hz then output jianpin in out list
 #if py not quanpin it will return true, otherwise return false
 def quanPin(py, hz,out): #hz is gb18030 encode
-	len_hz = len(hz)/2
+	len_hz = len(hz)
 	len_py = len(py)
 	if not py or not hz:
 		return False
 	#print len_hz
 	if len_hz == 1:
 		if py in pys:
+			print py
 			out.append(py[0])
 			return True
 		else:
 			return False
 	if len_hz == 2:
+		#print hz, len_hz
 		for i in range(len_py-1,0,-1):
 			if py[:i] in pys and py[i:] in pys:
 				out.append(py[i:][0])
@@ -42,7 +44,7 @@ def quanPin(py, hz,out): #hz is gb18030 encode
 		return False
 	if len_hz > 2:#µÝ¹é´¦Àí
 		for i in range(len_py-1, 0, -1):
-			if quanPin(py[i:], hz[-2:], out) and quanPin(py[:i], hz[:-2], out):
+			if quanPin(py[i:], hz[-1:], out) and quanPin(py[:i], hz[:-1], out):
 				return True
 	return False
 
@@ -51,10 +53,13 @@ def quanPin(py, hz,out): #hz is gb18030 encode
 for line in sys.stdin:
 	line = line.strip()
 	#print line
+	line = line.decode('gb18030')
 	segs = line.split(' ')
 	print segs[0], segs[1]
 	out = []
+	hz_len = len(segs[1])
+	print hz_len
 	if(quanPin(segs[0], segs[1],out)):
-		print ''.join(out[::-1])
+		print ''.join(out[::-1])[:hz_len]
 	else:
 		print  >> sys.stderr,"Error %s not quanpin!!" % line
